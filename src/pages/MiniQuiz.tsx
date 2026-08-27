@@ -24,7 +24,6 @@ export function MiniQuiz({ onExit }: MiniQuizProps) {
   );
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [revealed, setRevealed] = useState(false);
   const [correctCount, setCorrectCount] = useState(0);
   const [wrongCount, setWrongCount] = useState(0);
   const [resultSaved, setResultSaved] = useState(false);
@@ -61,7 +60,6 @@ export function MiniQuiz({ onExit }: MiniQuizProps) {
     recordQuizAnswer(current.id, wasCorrect);
     setCorrectCount((c) => c + (wasCorrect ? 1 : 0));
     setWrongCount((c) => c + (wasCorrect ? 0 : 1));
-    setRevealed(false);
     setCurrentIndex((i) => i + 1);
   };
 
@@ -121,10 +119,8 @@ export function MiniQuiz({ onExit }: MiniQuizProps) {
             >
               <QuizQuestionCard
                 question={current}
-                revealed={revealed}
-                onReveal={() => setRevealed(true)}
-                onKnown={() => handleAnswer(true)}
-                onForgot={() => handleAnswer(false)}
+                allQuestions={allQuestions}
+                onAnswer={handleAnswer}
               />
             </motion.div>
           </AnimatePresence>

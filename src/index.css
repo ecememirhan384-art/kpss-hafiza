@@ -12,6 +12,12 @@
   --color-navy: #1e2a47;
   --color-navy-soft: #5b6987;
 
+  /* Multiple-choice option feedback */
+  --color-success: #2f855a;
+  --color-success-light: #e8f7ee;
+  --color-error: #d1435b;
+  --color-error-light: #fdeaee;
+
   /* Quick Review: pastel per-memoryType tag colors (bg + ink accent) */
   --color-tag-chronology: #fdeee3;
   --color-tag-chronology-ink: #b1590e;

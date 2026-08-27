@@ -1,21 +1,30 @@
+import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
+import { Check, X } from 'lucide-react';
 import type { Question } from '../../types/question';
+import { buildOptions } from '../../lib/quizOptions';
 
 interface QuizQuestionCardProps {
   question: Question;
-  revealed: boolean;
-  onReveal: () => void;
-  onKnown: () => void;
-  onForgot: () => void;
+  allQuestions: Question[];
+  onAnswer: (wasCorrect: boolean) => void;
 }
 
 export function QuizQuestionCard({
   question,
-  revealed,
-  onReveal,
-  onKnown,
-  onForgot,
+  allQuestions,
+  onAnswer,
 }: QuizQuestionCardProps) {
+  const [selected, setSelected] = useState<string | null>(null);
+
+  const options = useMemo(
+    () => buildOptions(question, allQuestions),
+    [question, allQuestions],
+  );
+
+  const answered = selected !== null;
+  const isCorrect = selected === question.answerText;
+
   const examBadge = [question.examYear, question.examType]
     .filter(Boolean)
     .join(' ');
@@ -37,49 +46,66 @@ export function QuizQuestionCard({
         {question.question}
       </p>
 
-      {!revealed && (
-        <motion.button
-          whileTap={{ scale: 0.97 }}
-          whileHover={{ y: -1 }}
-          onClick={onReveal}
-          className="self-start inline-flex items-center gap-2 rounded-2xl bg-lila-light text-lila-dark font-semibold px-5 py-2.5"
-        >
-          👀 Cevabı Göster
-        </motion.button>
-      )}
+      <div className="flex flex-col gap-2.5">
+        {options.map((option, index) => {
+          const isThisAnswer = option === question.answerText;
+          const isThisSelected = option === selected;
+          const letter = String.fromCharCode(65 + index);
 
-      {revealed && (
+          let stateClasses =
+            'border-navy/10 bg-white text-navy hover:border-lila/40';
+          if (answered && isThisAnswer) {
+            stateClasses = 'border-success bg-success-light text-success';
+          } else if (answered && isThisSelected) {
+            stateClasses = 'border-error bg-error-light text-error';
+          } else if (answered) {
+            stateClasses = 'border-navy/5 bg-white text-navy-soft opacity-60';
+          }
+
+          return (
+            <motion.button
+              key={option}
+              type="button"
+              whileTap={!answered ? { scale: 0.98 } : undefined}
+              disabled={answered}
+              onClick={() => setSelected(option)}
+              className={`flex items-center gap-3 rounded-2xl border px-4 py-3 text-left text-sm sm:text-base font-semibold transition-colors ${stateClasses}`}
+            >
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-black/5 text-xs font-bold">
+                {letter}
+              </span>
+              <span className="flex-1 break-words">{option}</span>
+              {answered && isThisAnswer && (
+                <Check size={18} className="shrink-0 text-success" />
+              )}
+              {answered && isThisSelected && !isThisAnswer && (
+                <X size={18} className="shrink-0 text-error" />
+              )}
+            </motion.button>
+          );
+        })}
+      </div>
+
+      {answered && (
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.25, ease: 'easeOut' }}
           className="flex flex-col gap-4"
         >
-          <div>
-            <p className="text-xs font-bold text-navy-soft uppercase tracking-wide">
-              Cevap
-            </p>
-            <p className="mt-1 text-base font-bold text-lila-dark break-words">
-              {question.answerText}
-            </p>
-          </div>
+          <p
+            className={`text-sm font-bold ${isCorrect ? 'text-success' : 'text-error'}`}
+          >
+            {isCorrect ? '😎 Doğru bildin!' : '🔴 Doğru cevap işaretlendi.'}
+          </p>
 
-          <div className="flex flex-col sm:flex-row gap-3 pt-1">
-            <motion.button
-              whileTap={{ scale: 0.97 }}
-              onClick={onKnown}
-              className="flex-1 rounded-2xl bg-lila text-white font-semibold px-5 py-3"
-            >
-              😎 Bildim
-            </motion.button>
-            <motion.button
-              whileTap={{ scale: 0.97 }}
-              onClick={onForgot}
-              className="flex-1 rounded-2xl bg-white border border-navy/10 text-navy font-semibold px-5 py-3"
-            >
-              🔴 Bilemedim
-            </motion.button>
-          </div>
+          <motion.button
+            whileTap={{ scale: 0.97 }}
+            onClick={() => onAnswer(isCorrect)}
+            className="rounded-2xl bg-lila text-white font-semibold px-5 py-3"
+          >
+            Devam Et →
+          </motion.button>
         </motion.div>
       )}
     </div>

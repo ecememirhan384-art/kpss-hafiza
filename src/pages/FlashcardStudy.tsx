@@ -29,7 +29,6 @@ export function FlashcardStudy({ mode, onExit }: FlashcardStudyProps) {
   });
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [revealed, setRevealed] = useState(false);
   const [sessionCorrect, setSessionCorrect] = useState(0);
   const [sessionWrong, setSessionWrong] = useState(0);
   // Guards against double-recording an answer while the old card is still
@@ -60,7 +59,6 @@ export function FlashcardStudy({ mode, onExit }: FlashcardStudyProps) {
     recordAnswer(currentQuestion.id, wasCorrect);
     setSessionCorrect((c) => c + (wasCorrect ? 1 : 0));
     setSessionWrong((c) => c + (wasCorrect ? 0 : 1));
-    setRevealed(false);
     setCurrentIndex((i) => i + 1);
   };
 
@@ -72,7 +70,6 @@ export function FlashcardStudy({ mode, onExit }: FlashcardStudyProps) {
       setQuestions(selectReviewQuestions(allQuestions, getAllQuestionProgress()));
     }
     setCurrentIndex(0);
-    setRevealed(false);
     setSessionCorrect(0);
     setSessionWrong(0);
   };
@@ -111,8 +108,7 @@ export function FlashcardStudy({ mode, onExit }: FlashcardStudyProps) {
             <PartyPopper className="text-lila" size={32} strokeWidth={2} />
             <h2 className="text-xl font-bold text-navy">{finishedTitle}</h2>
             <p className="text-sm text-navy-soft">
-              😎 {sessionCorrect} biliyordum &nbsp;·&nbsp; 🔴 {sessionWrong}{' '}
-              unuttum
+              😎 {sessionCorrect} doğru &nbsp;·&nbsp; 🔴 {sessionWrong} yanlış
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3 mt-3 w-full">
@@ -143,10 +139,8 @@ export function FlashcardStudy({ mode, onExit }: FlashcardStudyProps) {
             >
               <FlashcardCard
                 question={currentQuestion}
-                revealed={revealed}
-                onReveal={() => setRevealed(true)}
-                onKnown={() => handleAnswer(true)}
-                onForgot={() => handleAnswer(false)}
+                allQuestions={allQuestions}
+                onAnswer={handleAnswer}
               />
             </motion.div>
           </AnimatePresence>
