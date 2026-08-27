@@ -1,0 +1,62 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Nunito', ui-sans-serif, system-ui, sans-serif;
+
+  --color-cream: #fbf8f4;
+  --color-lila: #8b7cf6;
+  --color-lila-light: #ede9fe;
+  --color-lila-dark: #6d5bd0;
+  --color-pink-soft: #fbcfe8;
+  --color-pink-soft-light: #fdf2f8;
+  --color-navy: #1e2a47;
+  --color-navy-soft: #5b6987;
+
+  /* Quick Review: pastel per-memoryType tag colors (bg + ink accent) */
+  --color-tag-chronology: #fdeee3;
+  --color-tag-chronology-ink: #b1590e;
+  --color-tag-date: #fef6e0;
+  --color-tag-date-ink: #a9820a;
+  --color-tag-person: #f1eafb;
+  --color-tag-person-ink: #7c3aed;
+  --color-tag-agreement: #e7f1fc;
+  --color-tag-agreement-ink: #2563a8;
+  --color-tag-organization: #e8f7ee;
+  --color-tag-organization-ink: #2f855a;
+  --color-tag-event: #fdecf3;
+  --color-tag-event-ink: #be3d7c;
+  --color-tag-place: #e3f6f6;
+  --color-tag-place-ink: #147a7a;
+  --color-tag-concept: #efeef5;
+  --color-tag-concept-ink: #5b5680;
+  --color-tag-other: #f1f1f2;
+  --color-tag-other-ink: #5b6987;
+
+  /* Quick Review: rotating section-header stripe colors */
+  --color-stripe-0: #8b7cf6;
+  --color-stripe-1: #f6a35b;
+  --color-stripe-2: #5bbf9e;
+  --color-stripe-3: #f16a8c;
+}
+
+body {
+  background-color: var(--color-cream);
+  color: var(--color-navy);
+  font-family: var(--font-sans);
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 13mm;
+  }
+
+  body {
+    background-color: #fff;
+  }
+
+  * {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}
