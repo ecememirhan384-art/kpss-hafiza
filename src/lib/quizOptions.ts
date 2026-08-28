@@ -89,6 +89,23 @@ function isSelfReferential(question: Question, candidateAnswer: string): boolean
   return normalize(question.question).includes(normalize(core));
 }
 
+// "Misakımillî ile ilgili hangisi DOĞRU DEĞİLDİR?" style questions ask the
+// student to spot the one FALSE claim among several true claims about one
+// narrow topic. Two things break for this family specifically:
+//  1) the answer's own text only reads as false because of its trailing
+//     aside ("Boğazların ... açılması ilkesinin benimsendiği (bu ifade
+//     doğru değildir)") — cleanAnswerForDisplay strips that aside, so the
+//     option silently reads as a true-sounding claim while still being
+//     marked "correct" (green) when picked.
+//  2) a coherent option set needs 3 other TRUE claims about that same
+//     narrow topic, which the cross-question answer pool can't supply —
+//     other questions' answers are true facts about unrelated topics, not
+//     alternate claims about this one.
+// Neither is fixable by picking better distractors, so this whole question
+// family is routed to the reveal/self-report fallback instead.
+const FALSE_STATEMENT_QUESTION_RE =
+  /doğru değildir|yanlıştır|hangisi yanlış|yanlış (bilgi|olan|öncül|eşleştirme)/i;
+
 let canonicalTypeCache: { source: Question[]; map: Map<string, string> } | null = null;
 
 function getCanonicalType(question: Question, allQuestions: Question[]): string {
@@ -114,6 +131,8 @@ function getCanonicalType(question: Question, allQuestions: Question[]): string 
  * an extra boost for date questions.
  */
 export function buildOptions(question: Question, allQuestions: Question[]): string[] | null {
+  if (FALSE_STATEMENT_QUESTION_RE.test(question.question)) return null;
+
   const correct = question.answerText;
   const correctLen = correct.length;
   // Two answers can differ only in their trailing justification aside —
