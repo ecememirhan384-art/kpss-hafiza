@@ -116,7 +116,13 @@ function getCanonicalType(question: Question, allQuestions: Question[]): string 
 export function buildOptions(question: Question, allQuestions: Question[]): string[] | null {
   const correct = question.answerText;
   const correctLen = correct.length;
-  const correctKey = normalize(correct);
+  // Two answers can differ only in their trailing justification aside —
+  // "Mondros Ateşkes Antlaşması" vs. "Mondros Ateşkes Antlaşması
+  // (Mütarekesi)" — and read as identical once cleanAnswerForDisplay
+  // strips that aside for display. Dedupe on the *displayed* form so two
+  // options that would look the same to the student are never both shown.
+  const dedupeKey = (text: string) => normalize(cleanAnswerForDisplay(text));
+  const correctKey = dedupeKey(correct);
   const anchorType = getCanonicalType(question, allQuestions);
   const correctYear = anchorType === 'date' ? extractYear(correct) : null;
   const seen = new Set([correctKey]);
@@ -124,7 +130,7 @@ export function buildOptions(question: Question, allQuestions: Question[]): stri
   const scored: Array<{ text: string; score: number }> = [];
   for (const candidate of allQuestions) {
     if (candidate.id === question.id) continue;
-    const candidateKey = normalize(candidate.answerText);
+    const candidateKey = dedupeKey(candidate.answerText);
     if (seen.has(candidateKey)) continue;
 
     const candidateType = getCanonicalType(candidate, allQuestions);
