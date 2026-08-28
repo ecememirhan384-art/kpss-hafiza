@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Check, X } from 'lucide-react';
 import type { Question } from '../../types/question';
-import { buildOptions } from '../../lib/quizOptions';
+import { buildOptions, cleanAnswerForDisplay } from '../../lib/quizOptions';
 
 interface QuizQuestionCardProps {
   question: Question;
@@ -74,17 +74,19 @@ export function QuizQuestionCard({
                 whileTap={!answered ? { scale: 0.98 } : undefined}
                 disabled={answered}
                 onClick={() => setSelected(option)}
-                className={`flex items-center gap-3 rounded-2xl border px-4 py-3 text-left text-sm sm:text-base font-semibold transition-colors ${stateClasses}`}
+                className={`flex items-start gap-3 rounded-2xl border px-4 py-3 text-left text-sm sm:text-base font-medium transition-colors ${stateClasses}`}
               >
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-black/5 text-xs font-bold">
+                <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-black/5 text-xs font-bold">
                   {letter}
                 </span>
-                <span className="flex-1 break-words">{option}</span>
+                <span className="flex-1 break-words leading-snug">
+                  {cleanAnswerForDisplay(option)}
+                </span>
                 {answered && isThisAnswer && (
-                  <Check size={18} className="shrink-0 text-success" />
+                  <Check size={18} className="mt-0.5 shrink-0 text-success" />
                 )}
                 {answered && isThisSelected && !isThisAnswer && (
-                  <X size={18} className="shrink-0 text-error" />
+                  <X size={18} className="mt-0.5 shrink-0 text-error" />
                 )}
               </motion.button>
             );
@@ -122,7 +124,7 @@ export function QuizQuestionCard({
                 Cevap
               </p>
               <p className="mt-1 text-base font-bold text-lila-dark break-words">
-                {question.answerText}
+                {cleanAnswerForDisplay(question.answerText)}
               </p>
             </div>
           )}

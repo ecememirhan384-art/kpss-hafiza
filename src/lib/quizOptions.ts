@@ -18,6 +18,20 @@ function coreAnswer(text: string): string {
   return (idx > 0 ? text.slice(0, idx) : text).trim();
 }
 
+// Elimination-style answers often trail off into a justification clause —
+// "Wilson İlkeleri'nin yayımlanması (I. Dünya Savaşı devam ederken
+// yayımlanmıştır)". That reasoning belongs in the explanation panel, not
+// crammed into an option button: it reads as a run-on sentence and makes
+// the option list harder to scan. Strip only a single TRAILING
+// parenthetical (never one in the middle — some answers like "Almanya
+// (Doğu-Batı Almanya) ve Kore (Kuzey-Güney Kore)" use parentheses as part
+// of the actual content, and only the trailing one is safe to assume is a
+// justification aside).
+export function cleanAnswerForDisplay(text: string): string {
+  const cleaned = text.replace(/\s*\([^()]*\)\s*$/, '').trim();
+  return cleaned.length > 0 ? cleaned : text.trim();
+}
+
 // A one-word answer next to a full sentence reads as an obviously fake
 // option. Only pair up answers whose lengths are in the same ballpark.
 function lengthCloseEnough(correctLen: number, candidateLen: number): boolean {
